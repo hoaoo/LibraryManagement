@@ -16,9 +16,7 @@ vector<Book> FileHandler::loadBooksFromFile(const string& filename) {
 
     string line;
     while (getline(file, line)) {
-        if (line.empty()) {
-            continue;
-        }
+        if (line.empty()) continue;
 
         stringstream ss(line);
         string bookId, title, author, category, quantityStr, availableStr;
@@ -55,6 +53,52 @@ void FileHandler::saveBooksToFile(const string& filename, const vector<Book>& bo
              << book.getCategory() << "|"
              << book.getQuantity() << "|"
              << book.getAvailable() << "\n";
+    }
+
+    file.close();
+}
+
+vector<Reader> FileHandler::loadReadersFromFile(const string& filename) {
+    vector<Reader> readers;
+    ifstream file(filename);
+
+    if (!file.is_open()) {
+        cout << "Khong the mo file " << filename << ". Se tao moi khi luu du lieu.\n";
+        return readers;
+    }
+
+    string line;
+    while (getline(file, line)) {
+        if (line.empty()) continue;
+
+        stringstream ss(line);
+        string readerId, name, phone, email;
+
+        getline(ss, readerId, '|');
+        getline(ss, name, '|');
+        getline(ss, phone, '|');
+        getline(ss, email, '|');
+
+        readers.emplace_back(readerId, name, phone, email);
+    }
+
+    file.close();
+    return readers;
+}
+
+void FileHandler::saveReadersToFile(const string& filename, const vector<Reader>& readers) {
+    ofstream file(filename);
+
+    if (!file.is_open()) {
+        cout << "Khong the ghi file " << filename << endl;
+        return;
+    }
+
+    for (const auto& reader : readers) {
+        file << reader.getReaderId() << "|"
+             << reader.getName() << "|"
+             << reader.getPhone() << "|"
+             << reader.getEmail() << "\n";
     }
 
     file.close();

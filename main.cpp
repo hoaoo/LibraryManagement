@@ -34,7 +34,7 @@ int main() {
                 manager.bookMenu();
                 break;
             case 2:
-                cout << "Chuc nang quan ly doc gia dang phat trien." << endl;
+                manager.readerMenu();
                 break;
             case 3:
                 cout << "Chuc nang muon sach dang phat trien." << endl;

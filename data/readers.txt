@@ -1,0 +1,5 @@
+﻿R001|Nguyen Van A|0123456789|a@gmail.com
+R002|Tran Thi B|0987654321|b@gmail.com
+R003|Le Van C|0911222333|c@gmail.com
+R123|Nguy?n D? Hoan |0865133136|haon08912@gmail.com
+R234|Nguyễn Đỗ Hoan |0985519834 |nguyendohoan0812@gmial.com

@@ -2,6 +2,7 @@
 #define READER_H
 
 #include <string>
+
 using namespace std;
 
 class Reader {
@@ -20,6 +21,7 @@ public:
     string getPhone() const;
     string getEmail() const;
 
+    void setReaderId(const string& readerId);
     void setName(const string& name);
     void setPhone(const string& phone);
     void setEmail(const string& email);
