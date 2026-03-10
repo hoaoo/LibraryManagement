@@ -2,6 +2,7 @@
 #define BOOK_H
 
 #include <string>
+
 using namespace std;
 
 class Book {
@@ -24,6 +25,7 @@ public:
     int getQuantity() const;
     int getAvailable() const;
 
+    void setBookId(const string& bookId);
     void setTitle(const string& title);
     void setAuthor(const string& author);
     void setCategory(const string& category);

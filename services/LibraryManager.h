@@ -15,13 +15,18 @@ private:
     vector<Reader> readers;
     vector<BorrowRecord> records;
 
+    int findBookIndexById(const string& bookId) const;
+
 public:
     LibraryManager();
 
     // Book management
     void addBook();
     void showAllBooks() const;
-    void findBookById(const string& bookId) const;
+    void findBookById() const;
+    void findBookByTitle() const;
+    void updateBook();
+    void deleteBook();
 
     // Menu
     void bookMenu();

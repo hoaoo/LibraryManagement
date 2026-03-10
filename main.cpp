@@ -22,6 +22,13 @@ int main() {
         showMainMenu();
         cin >> choice;
 
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(10000, '\n');
+            cout << "Vui long nhap so hop le.\n";
+            continue;
+        }
+
         switch (choice) {
             case 1:
                 manager.bookMenu();
