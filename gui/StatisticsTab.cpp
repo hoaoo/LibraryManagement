@@ -1,0 +1,106 @@
+#include "StatisticsTab.h"
+
+#include <QVBoxLayout>
+#include <QGridLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <QTableWidget>
+#include <QHeaderView>
+#include <QGroupBox>
+#include <QTableWidgetItem>
+#include <QAbstractItemView>
+
+StatisticsTab::StatisticsTab(LibraryManager& manager, QWidget *parent)
+    : QWidget(parent), manager(manager) {
+    setupUi();
+    loadStatistics();
+}
+
+void StatisticsTab::setupUi() {
+    auto *mainLayout = new QVBoxLayout(this);
+
+    auto *statsGroup = new QGroupBox("Overview", this);
+    auto *statsLayout = new QGridLayout();
+
+    totalBooksLabel = new QLabel("Total books: 0", this);
+    totalReadersLabel = new QLabel("Total readers: 0", this);
+    borrowingBooksLabel = new QLabel("Books being borrowed: 0", this);
+    outOfStockBooksLabel = new QLabel("Out of stock books: 0", this);
+
+    statsLayout->addWidget(totalBooksLabel, 0, 0);
+    statsLayout->addWidget(totalReadersLabel, 0, 1);
+    statsLayout->addWidget(borrowingBooksLabel, 1, 0);
+    statsLayout->addWidget(outOfStockBooksLabel, 1, 1);
+
+    statsGroup->setLayout(statsLayout);
+
+    auto *borrowingGroup = new QGroupBox("Books Currently Borrowed", this);
+    auto *borrowingLayout = new QVBoxLayout();
+    borrowingTable = new QTableWidget(this);
+    borrowingTable->setColumnCount(5);
+    borrowingTable->setHorizontalHeaderLabels({
+        "Record ID", "Book ID", "Title", "Reader ID", "Borrow Date"
+    });
+    borrowingTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    borrowingTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    borrowingTable->verticalHeader()->setVisible(false);
+    borrowingLayout->addWidget(borrowingTable);
+    borrowingGroup->setLayout(borrowingLayout);
+
+    auto *outOfStockGroup = new QGroupBox("Out of Stock Books", this);
+    auto *outOfStockLayout = new QVBoxLayout();
+    outOfStockTable = new QTableWidget(this);
+    outOfStockTable->setColumnCount(4);
+    outOfStockTable->setHorizontalHeaderLabels({
+        "Book ID", "Title", "Author", "Available"
+    });
+    outOfStockTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    outOfStockTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    outOfStockTable->verticalHeader()->setVisible(false);
+    outOfStockLayout->addWidget(outOfStockTable);
+    outOfStockGroup->setLayout(outOfStockLayout);
+
+    refreshButton = new QPushButton("Refresh Statistics", this);
+
+    mainLayout->addWidget(statsGroup);
+    mainLayout->addWidget(borrowingGroup);
+    mainLayout->addWidget(outOfStockGroup);
+    mainLayout->addWidget(refreshButton);
+
+    connect(refreshButton, &QPushButton::clicked, this, &StatisticsTab::onRefreshStatistics);
+}
+
+void StatisticsTab::loadStatistics() {
+    totalBooksLabel->setText("Total books: " + QString::number(manager.getTotalBooksCountGUI()));
+    totalReadersLabel->setText("Total readers: " + QString::number(manager.getTotalReadersCountGUI()));
+    borrowingBooksLabel->setText("Books being borrowed: " + QString::number(manager.getBorrowingCountGUI()));
+    outOfStockBooksLabel->setText("Out of stock books: " + QString::number(static_cast<int>(manager.getOutOfStockBooksGUI().size())));
+
+    borrowingTable->setRowCount(0);
+    auto borrowingRecords = manager.getBorrowingRecordsGUI();
+    for (int i = 0; i < static_cast<int>(borrowingRecords.size()); ++i) {
+        borrowingTable->insertRow(i);
+        borrowingTable->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(borrowingRecords[i].getRecordId())));
+        borrowingTable->setItem(i, 1, new QTableWidgetItem(QString::fromStdString(borrowingRecords[i].getBookId())));
+        borrowingTable->setItem(i, 2, new QTableWidgetItem(QString::fromStdString(manager.getBookTitleByIdGUI(borrowingRecords[i].getBookId()))));
+        borrowingTable->setItem(i, 3, new QTableWidgetItem(QString::fromStdString(borrowingRecords[i].getReaderId())));
+        borrowingTable->setItem(i, 4, new QTableWidgetItem(QString::fromStdString(borrowingRecords[i].getBorrowDate())));
+    }
+
+    outOfStockTable->setRowCount(0);
+    auto outOfStockBooks = manager.getOutOfStockBooksGUI();
+    for (int i = 0; i < static_cast<int>(outOfStockBooks.size()); ++i) {
+        outOfStockTable->insertRow(i);
+        outOfStockTable->setItem(i, 0, new QTableWidgetItem(QString::fromStdString(outOfStockBooks[i].getBookId())));
+        outOfStockTable->setItem(i, 1, new QTableWidgetItem(QString::fromStdString(outOfStockBooks[i].getTitle())));
+        outOfStockTable->setItem(i, 2, new QTableWidgetItem(QString::fromStdString(outOfStockBooks[i].getAuthor())));
+        outOfStockTable->setItem(i, 3, new QTableWidgetItem(QString::number(outOfStockBooks[i].getAvailable())));
+    }
+}
+
+void StatisticsTab::onRefreshStatistics() {
+    manager.loadBooks();
+    manager.loadReaders();
+    manager.loadBorrowRecords();
+    loadStatistics();
+}
