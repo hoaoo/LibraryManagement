@@ -8,7 +8,7 @@ void showMainMenu() {
     cout << "1. Quan ly sach" << endl;
     cout << "2. Quan ly doc gia" << endl;
     cout << "3. Muon / Tra sach" << endl;
-    cout << "4. Tra sach" << endl;
+    cout << "4. Chuc nang khac" << endl;
     cout << "5. Thong ke" << endl;
     cout << "0. Thoat" << endl;
     cout << "Nhap lua chon: ";
@@ -40,10 +40,10 @@ int main() {
                 manager.borrowMenu();
                 break;
             case 4:
-                cout << "Chuc nang nay da duoc dua vao menu Muon / Tra sach." << endl;
+                cout << "Chuc nang nay chua duoc su dung." << endl;
                 break;
             case 5:
-                cout << "Chuc nang thong ke dang phat trien." << endl;
+                manager.statisticsMenu();
                 break;
             case 0:
                 cout << "Thoat chuong trinh." << endl;

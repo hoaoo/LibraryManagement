@@ -31,6 +31,7 @@ public:
     void loadBorrowRecords();
     void saveBorrowRecords() const;
 
+    // Book
     void addBook();
     void showAllBooks() const;
     void findBookById() const;
@@ -38,16 +39,25 @@ public:
     void updateBook();
     void deleteBook();
 
+    // Reader
     void addReader();
     void showAllReaders() const;
     void findReaderById() const;
     void updateReader();
     void deleteReader();
 
+    // Borrow / Return
     void borrowBook();
     void returnBook();
     void showAllBorrowRecords() const;
 
+    // Statistics
+    void showGeneralStatistics() const;
+    void showBorrowedBooks() const;
+    void showOutOfStockBooks() const;
+    void statisticsMenu() const;
+
+    // Menu
     void bookMenu();
     void readerMenu();
     void borrowMenu();

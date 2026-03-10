@@ -698,3 +698,140 @@ void LibraryManager::borrowMenu() {
         }
     } while (choice != 0);
 }
+void LibraryManager::showGeneralStatistics() const {
+    int totalBookTitles = (int)books.size();
+    int totalBookQuantity = 0;
+    int totalAvailableBooks = 0;
+    int totalBorrowedBooks = 0;
+
+    for (const auto& book : books) {
+        totalBookQuantity += book.getQuantity();
+        totalAvailableBooks += book.getAvailable();
+        totalBorrowedBooks += (book.getQuantity() - book.getAvailable());
+    }
+
+    int totalReaders = (int)readers.size();
+    int totalBorrowRecords = (int)records.size();
+
+    int borrowingRecords = 0;
+    int returnedRecords = 0;
+
+    for (const auto& record : records) {
+        if (record.getStatus() == "Borrowed") {
+            borrowingRecords++;
+        } else if (record.getStatus() == "Returned") {
+            returnedRecords++;
+        }
+    }
+
+    cout << "\n===== THONG KE TONG QUAN =====\n";
+    cout << "Tong so dau sach: " << totalBookTitles << endl;
+    cout << "Tong so ban sach: " << totalBookQuantity << endl;
+    cout << "So sach dang duoc muon: " << totalBorrowedBooks << endl;
+    cout << "So sach con trong thu vien: " << totalAvailableBooks << endl;
+    cout << "Tong so doc gia: " << totalReaders << endl;
+    cout << "Tong so phieu muon: " << totalBorrowRecords << endl;
+    cout << "So phieu dang muon: " << borrowingRecords << endl;
+    cout << "So phieu da tra: " << returnedRecords << endl;
+}
+void LibraryManager::showBorrowedBooks() const {
+    cout << "\n===== DANH SACH SACH DANG DUOC MUON =====\n";
+
+    bool found = false;
+
+    cout << left
+         << setw(10) << "Ma sach"
+         << setw(30) << "Ten sach"
+         << setw(25) << "Tac gia"
+         << setw(20) << "The loai"
+         << setw(10) << "Tong"
+         << setw(10) << "Con lai"
+         << setw(12) << "Dang muon"
+         << endl;
+
+    cout << string(117, '-') << endl;
+
+    for (const auto& book : books) {
+        int borrowed = book.getQuantity() - book.getAvailable();
+        if (borrowed > 0) {
+            cout << left
+                 << setw(10) << book.getBookId()
+                 << setw(30) << book.getTitle()
+                 << setw(25) << book.getAuthor()
+                 << setw(20) << book.getCategory()
+                 << setw(10) << book.getQuantity()
+                 << setw(10) << book.getAvailable()
+                 << setw(12) << borrowed
+                 << endl;
+            found = true;
+        }
+    }
+
+    if (!found) {
+        cout << "Khong co sach nao dang duoc muon.\n";
+    }
+}
+void LibraryManager::statisticsMenu() const {
+    int choice;
+
+    do {
+        cout << "\n===== THONG KE =====\n";
+        cout << "1. Thong ke tong quan\n";
+        cout << "2. Danh sach sach dang duoc muon\n";
+        cout << "3. Danh sach sach da muon het\n";
+        cout << "0. Quay lai\n";
+        cout << "Nhap lua chon: ";
+        cin >> choice;
+
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Vui long nhap so hop le.\n";
+            continue;
+        }
+
+        switch (choice) {
+            case 1:
+                showGeneralStatistics();
+                break;
+            case 2:
+                showBorrowedBooks();
+                break;
+            case 3:
+                showOutOfStockBooks();
+                break;
+            case 0:
+                cout << "Quay lai menu chinh.\n";
+                break;
+            default:
+                cout << "Lua chon khong hop le.\n";
+        }
+    } while (choice != 0);
+}
+void LibraryManager::showOutOfStockBooks() const {
+    cout << "\n===== DANH SACH SACH DA MUON HET =====\n";
+
+    bool found = false;
+
+    cout << left
+         << setw(10) << "Ma sach"
+         << setw(30) << "Ten sach"
+         << setw(25) << "Tac gia"
+         << setw(20) << "The loai"
+         << setw(10) << "Tong"
+         << setw(10) << "Con lai"
+         << endl;
+
+    cout << string(105, '-') << endl;
+
+    for (const auto& book : books) {
+        if (book.getAvailable() == 0) {
+            book.display();
+            found = true;
+        }
+    }
+
+    if (!found) {
+        cout << "Khong co sach nao bi muon het.\n";
+    }
+}
