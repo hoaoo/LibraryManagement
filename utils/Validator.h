@@ -1,8 +1,23 @@
-//
-// Created by nguye on 3/10/2026.
-//
+#ifndef VALIDATOR_H
+#define VALIDATOR_H
 
-#ifndef LIBRARYMANAGEMENT_VALIDATOR_H
-#define LIBRARYMANAGEMENT_VALIDATOR_H
+#include <string>
 
-#endif //LIBRARYMANAGEMENT_VALIDATOR_H
+using namespace std;
+
+class Validator {
+public:
+    // Nhập số nguyên, bắt buộc >= minValue
+    static int inputInt(const string& message, int minValue = 0);
+
+    // Nhập chuỗi không được để trống
+    static string inputNonEmptyString(const string& message);
+
+    // Kiểm tra định dạng ngày YYYY-MM-DD
+    static bool isValidDateFormat(const string& date);
+
+    // Hỏi xác nhận y/n
+    static bool confirmAction(const string& message);
+};
+
+#endif

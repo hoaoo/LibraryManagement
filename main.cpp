@@ -1,17 +1,20 @@
 #include <iostream>
 #include "services/LibraryManager.h"
+#include "utils/Validator.h"
 
 using namespace std;
 
+// Ham hien thi menu chinh
 void showMainMenu() {
-    cout << "\n===== LIBRARY MANAGEMENT SYSTEM =====" << endl;
-    cout << "1. Quan ly sach" << endl;
-    cout << "2. Quan ly doc gia" << endl;
-    cout << "3. Muon / Tra sach" << endl;
-    cout << "4. Chuc nang khac" << endl;
-    cout << "5. Thong ke" << endl;
-    cout << "0. Thoat" << endl;
-    cout << "Nhap lua chon: ";
+    cout << "\n========================================\n";
+    cout << "        LIBRARY MANAGEMENT SYSTEM\n";
+    cout << "========================================\n";
+    cout << "1. Quan ly sach\n";
+    cout << "2. Quan ly doc gia\n";
+    cout << "3. Muon / Tra sach\n";
+    cout << "4. Thong ke\n";
+    cout << "0. Thoat\n";
+    cout << "----------------------------------------\n";
 }
 
 int main() {
@@ -20,14 +23,7 @@ int main() {
 
     do {
         showMainMenu();
-        cin >> choice;
-
-        if (cin.fail()) {
-            cin.clear();
-            cin.ignore(10000, '\n');
-            cout << "Vui long nhap so hop le.\n";
-            continue;
-        }
+        choice = Validator::inputInt("Nhap lua chon: ", 0);
 
         switch (choice) {
             case 1:
@@ -40,16 +36,13 @@ int main() {
                 manager.borrowMenu();
                 break;
             case 4:
-                cout << "Chuc nang nay chua duoc su dung." << endl;
-                break;
-            case 5:
                 manager.statisticsMenu();
                 break;
             case 0:
-                cout << "Thoat chuong trinh." << endl;
+                cout << "Thoat chuong trinh.\n";
                 break;
             default:
-                cout << "Lua chon khong hop le." << endl;
+                cout << "Lua chon khong hop le.\n";
         }
     } while (choice != 0);
 

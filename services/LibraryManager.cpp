@@ -1,9 +1,9 @@
 #include "LibraryManager.h"
 #include "../utils/FileHandler.h"
+#include "../utils/Validator.h"
 #include <iostream>
 #include <iomanip>
 #include <limits>
-
 using namespace std;
 
 LibraryManager::LibraryManager() {
@@ -60,47 +60,25 @@ int LibraryManager::findReaderIndexById(const string& readerId) const {
 }
 
 void LibraryManager::addBook() {
-    string id, title, author, category;
-    int quantity;
-
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
     cout << "\n===== THEM SACH =====\n";
 
-    cout << "Nhap ma sach: ";
-    getline(cin, id);
+    // Nhap thong tin sach bang cac ham validator
+    string id = Validator::inputNonEmptyString("Nhap ma sach: ");
 
-    if (id.empty()) {
-        cout << "Ma sach khong duoc de trong.\n";
-        return;
-    }
-
+    // Kiem tra trung ma sach
     if (findBookIndexById(id) != -1) {
         cout << "Ma sach da ton tai.\n";
         return;
     }
 
-    cout << "Nhap ten sach: ";
-    getline(cin, title);
-
-    cout << "Nhap tac gia: ";
-    getline(cin, author);
-
-    cout << "Nhap the loai: ";
-    getline(cin, category);
-
-    cout << "Nhap so luong: ";
-    cin >> quantity;
-
-    if (cin.fail() || quantity < 0) {
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cout << "So luong khong hop le.\n";
-        return;
-    }
+    string title = Validator::inputNonEmptyString("Nhap ten sach: ");
+    string author = Validator::inputNonEmptyString("Nhap tac gia: ");
+    string category = Validator::inputNonEmptyString("Nhap the loai: ");
+    int quantity = Validator::inputInt("Nhap so luong: ", 0);
 
     books.emplace_back(id, title, author, category, quantity, quantity);
     saveBooks();
+
     cout << "Them sach thanh cong.\n";
 }
 
@@ -134,13 +112,9 @@ void LibraryManager::findBookById() const {
         return;
     }
 
-    string id;
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-    cout << "\nNhap ma sach can tim: ";
-    getline(cin, id);
-
+    string id = Validator::inputNonEmptyString("Nhap ma sach can tim: ");
     int index = findBookIndexById(id);
+
     if (index == -1) {
         cout << "Khong tim thay sach co ma: " << id << endl;
         return;
@@ -165,13 +139,8 @@ void LibraryManager::findBookByTitle() const {
         return;
     }
 
-    string keyword;
+    string keyword = Validator::inputNonEmptyString("Nhap ten sach can tim: ");
     bool found = false;
-
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-    cout << "\nNhap ten sach can tim: ";
-    getline(cin, keyword);
 
     cout << "\n===== KET QUA TIM KIEM =====\n";
     cout << left
@@ -202,41 +171,25 @@ void LibraryManager::updateBook() {
         return;
     }
 
-    string id;
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cout << "\n===== SUA THONG TIN SACH =====\n";
 
-    cout << "\nNhap ma sach can sua: ";
-    getline(cin, id);
-
+    string id = Validator::inputNonEmptyString("Nhap ma sach can sua: ");
     int index = findBookIndexById(id);
+
     if (index == -1) {
         cout << "Khong tim thay sach co ma: " << id << endl;
         return;
     }
 
-    string title, author, category;
-    int quantity;
+    string title = Validator::inputNonEmptyString("Nhap ten sach moi: ");
+    string author = Validator::inputNonEmptyString("Nhap tac gia moi: ");
+    string category = Validator::inputNonEmptyString("Nhap the loai moi: ");
+    int quantity = Validator::inputInt("Nhap tong so luong moi: ", 0);
 
-    cout << "Nhap ten sach moi: ";
-    getline(cin, title);
-
-    cout << "Nhap tac gia moi: ";
-    getline(cin, author);
-
-    cout << "Nhap the loai moi: ";
-    getline(cin, category);
-
-    cout << "Nhap tong so luong moi: ";
-    cin >> quantity;
-
-    if (cin.fail() || quantity < 0) {
-        cin.clear();
-        cin.ignore(numeric_limits<streamsize>::max(), '\n');
-        cout << "So luong khong hop le.\n";
-        return;
-    }
-
+    // So sach dang duoc muon = tong - con lai
     int borrowed = books[index].getQuantity() - books[index].getAvailable();
+
+    // Khong cho tong so luong moi nho hon so sach dang muon
     if (quantity < borrowed) {
         cout << "Khong the giam tong so luong nho hon so sach dang duoc muon (" << borrowed << ").\n";
         return;
@@ -258,20 +211,25 @@ void LibraryManager::deleteBook() {
         return;
     }
 
-    string id;
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cout << "\n===== XOA SACH =====\n";
 
-    cout << "\nNhap ma sach can xoa: ";
-    getline(cin, id);
-
+    string id = Validator::inputNonEmptyString("Nhap ma sach can xoa: ");
     int index = findBookIndexById(id);
+
     if (index == -1) {
         cout << "Khong tim thay sach co ma: " << id << endl;
         return;
     }
 
+    // Khong cho xoa neu van con sach dang duoc muon
     if (books[index].getAvailable() != books[index].getQuantity()) {
         cout << "Khong the xoa sach nay vi dang co sach duoc muon.\n";
+        return;
+    }
+
+    // Xac nhan truoc khi xoa
+    if (!Validator::confirmAction("Ban co chac chan muon xoa sach nay khong")) {
+        cout << "Da huy thao tac xoa sach.\n";
         return;
     }
 
@@ -282,33 +240,19 @@ void LibraryManager::deleteBook() {
 }
 
 void LibraryManager::addReader() {
-    string id, name, phone, email;
-
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
     cout << "\n===== THEM DOC GIA =====\n";
 
-    cout << "Nhap ma doc gia: ";
-    getline(cin, id);
+    string id = Validator::inputNonEmptyString("Nhap ma doc gia: ");
 
-    if (id.empty()) {
-        cout << "Ma doc gia khong duoc de trong.\n";
-        return;
-    }
-
+    // Kiem tra trung ma doc gia
     if (findReaderIndexById(id) != -1) {
         cout << "Ma doc gia da ton tai.\n";
         return;
     }
 
-    cout << "Nhap ho ten: ";
-    getline(cin, name);
-
-    cout << "Nhap so dien thoai: ";
-    getline(cin, phone);
-
-    cout << "Nhap email: ";
-    getline(cin, email);
+    string name = Validator::inputNonEmptyString("Nhap ho ten: ");
+    string phone = Validator::inputNonEmptyString("Nhap so dien thoai: ");
+    string email = Validator::inputNonEmptyString("Nhap email: ");
 
     readers.emplace_back(id, name, phone, email);
     saveReaders();
@@ -344,13 +288,9 @@ void LibraryManager::findReaderById() const {
         return;
     }
 
-    string id;
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
-    cout << "\nNhap ma doc gia can tim: ";
-    getline(cin, id);
-
+    string id = Validator::inputNonEmptyString("Nhap ma doc gia can tim: ");
     int index = findReaderIndexById(id);
+
     if (index == -1) {
         cout << "Khong tim thay doc gia co ma: " << id << endl;
         return;
@@ -374,26 +314,19 @@ void LibraryManager::updateReader() {
         return;
     }
 
-    string id, name, phone, email;
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cout << "\n===== SUA THONG TIN DOC GIA =====\n";
 
-    cout << "\nNhap ma doc gia can sua: ";
-    getline(cin, id);
-
+    string id = Validator::inputNonEmptyString("Nhap ma doc gia can sua: ");
     int index = findReaderIndexById(id);
+
     if (index == -1) {
         cout << "Khong tim thay doc gia co ma: " << id << endl;
         return;
     }
 
-    cout << "Nhap ho ten moi: ";
-    getline(cin, name);
-
-    cout << "Nhap so dien thoai moi: ";
-    getline(cin, phone);
-
-    cout << "Nhap email moi: ";
-    getline(cin, email);
+    string name = Validator::inputNonEmptyString("Nhap ho ten moi: ");
+    string phone = Validator::inputNonEmptyString("Nhap so dien thoai moi: ");
+    string email = Validator::inputNonEmptyString("Nhap email moi: ");
 
     readers[index].setName(name);
     readers[index].setPhone(phone);
@@ -409,15 +342,18 @@ void LibraryManager::deleteReader() {
         return;
     }
 
-    string id;
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    cout << "\n===== XOA DOC GIA =====\n";
 
-    cout << "\nNhap ma doc gia can xoa: ";
-    getline(cin, id);
-
+    string id = Validator::inputNonEmptyString("Nhap ma doc gia can xoa: ");
     int index = findReaderIndexById(id);
+
     if (index == -1) {
         cout << "Khong tim thay doc gia co ma: " << id << endl;
+        return;
+    }
+
+    if (!Validator::confirmAction("Ban co chac chan muon xoa doc gia nay khong")) {
+        cout << "Da huy thao tac xoa doc gia.\n";
         return;
     }
 
@@ -431,7 +367,9 @@ void LibraryManager::bookMenu() {
     int choice;
 
     do {
-        cout << "\n===== QUAN LY SACH =====\n";
+        cout << "\n========================================\n";
+        cout << "              QUAN LY SACH\n";
+        cout << "========================================\n";
         cout << "1. Them sach\n";
         cout << "2. Hien thi danh sach sach\n";
         cout << "3. Tim sach theo ma\n";
@@ -441,23 +379,29 @@ void LibraryManager::bookMenu() {
         cout << "7. Tai lai danh sach sach tu file\n";
         cout << "8. Luu danh sach sach vao file\n";
         cout << "0. Quay lai\n";
-        cout << "Nhap lua chon: ";
-        cin >> choice;
+        cout << "----------------------------------------\n";
 
-        if (cin.fail()) {
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Vui long nhap so hop le.\n";
-            continue;
-        }
+        choice = Validator::inputInt("Nhap lua chon: ", 0);
 
         switch (choice) {
-            case 1: addBook(); break;
-            case 2: showAllBooks(); break;
-            case 3: findBookById(); break;
-            case 4: findBookByTitle(); break;
-            case 5: updateBook(); break;
-            case 6: deleteBook(); break;
+            case 1:
+                addBook();
+                break;
+            case 2:
+                showAllBooks();
+                break;
+            case 3:
+                findBookById();
+                break;
+            case 4:
+                findBookByTitle();
+                break;
+            case 5:
+                updateBook();
+                break;
+            case 6:
+                deleteBook();
+                break;
             case 7:
                 loadBooks();
                 cout << "Da tai lai du lieu sach tu file.\n";
@@ -479,7 +423,9 @@ void LibraryManager::readerMenu() {
     int choice;
 
     do {
-        cout << "\n===== QUAN LY DOC GIA =====\n";
+        cout << "\n========================================\n";
+        cout << "             QUAN LY DOC GIA\n";
+        cout << "========================================\n";
         cout << "1. Them doc gia\n";
         cout << "2. Hien thi danh sach doc gia\n";
         cout << "3. Tim doc gia theo ma\n";
@@ -488,22 +434,26 @@ void LibraryManager::readerMenu() {
         cout << "6. Tai lai danh sach doc gia tu file\n";
         cout << "7. Luu danh sach doc gia vao file\n";
         cout << "0. Quay lai\n";
-        cout << "Nhap lua chon: ";
-        cin >> choice;
+        cout << "----------------------------------------\n";
 
-        if (cin.fail()) {
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Vui long nhap so hop le.\n";
-            continue;
-        }
+        choice = Validator::inputInt("Nhap lua chon: ", 0);
 
         switch (choice) {
-            case 1: addReader(); break;
-            case 2: showAllReaders(); break;
-            case 3: findReaderById(); break;
-            case 4: updateReader(); break;
-            case 5: deleteReader(); break;
+            case 1:
+                addReader();
+                break;
+            case 2:
+                showAllReaders();
+                break;
+            case 3:
+                findReaderById();
+                break;
+            case 4:
+                updateReader();
+                break;
+            case 5:
+                deleteReader();
+                break;
             case 6:
                 loadReaders();
                 cout << "Da tai lai du lieu doc gia tu file.\n";
@@ -531,38 +481,27 @@ void LibraryManager::borrowBook() {
         return;
     }
 
-    string recordId, readerId, bookId, borrowDate;
-
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
     cout << "\n===== MUON SACH =====\n";
 
-    cout << "Nhap ma phieu muon: ";
-    getline(cin, recordId);
+    string recordId = Validator::inputNonEmptyString("Nhap ma phieu muon: ");
 
-    if (recordId.empty()) {
-        cout << "Ma phieu muon khong duoc de trong.\n";
-        return;
-    }
-
+    // Kiem tra trung ma phieu muon
     if (findBorrowRecordIndexById(recordId) != -1) {
         cout << "Ma phieu muon da ton tai.\n";
         return;
     }
 
-    cout << "Nhap ma doc gia: ";
-    getline(cin, readerId);
-
+    string readerId = Validator::inputNonEmptyString("Nhap ma doc gia: ");
     int readerIndex = findReaderIndexById(readerId);
+
     if (readerIndex == -1) {
         cout << "Khong tim thay doc gia.\n";
         return;
     }
 
-    cout << "Nhap ma sach: ";
-    getline(cin, bookId);
-
+    string bookId = Validator::inputNonEmptyString("Nhap ma sach: ");
     int bookIndex = findBookIndexById(bookId);
+
     if (bookIndex == -1) {
         cout << "Khong tim thay sach.\n";
         return;
@@ -573,11 +512,17 @@ void LibraryManager::borrowBook() {
         return;
     }
 
-    cout << "Nhap ngay muon (YYYY-MM-DD): ";
-    getline(cin, borrowDate);
+    string borrowDate = Validator::inputNonEmptyString("Nhap ngay muon (YYYY-MM-DD): ");
 
+    if (!Validator::isValidDateFormat(borrowDate)) {
+        cout << "Ngay muon khong dung dinh dang YYYY-MM-DD.\n";
+        return;
+    }
+
+    // Tao phieu muon moi
     records.emplace_back(recordId, readerId, bookId, borrowDate, "", "Borrowed");
 
+    // Giam so luong sach con lai
     books[bookIndex].setAvailable(books[bookIndex].getAvailable() - 1);
 
     saveBorrowRecords();
@@ -591,15 +536,11 @@ void LibraryManager::returnBook() {
         return;
     }
 
-    string recordId, returnDate;
-
-    cin.ignore(numeric_limits<streamsize>::max(), '\n');
-
     cout << "\n===== TRA SACH =====\n";
-    cout << "Nhap ma phieu muon: ";
-    getline(cin, recordId);
 
+    string recordId = Validator::inputNonEmptyString("Nhap ma phieu muon: ");
     int recordIndex = findBorrowRecordIndexById(recordId);
+
     if (recordIndex == -1) {
         cout << "Khong tim thay phieu muon.\n";
         return;
@@ -610,12 +551,17 @@ void LibraryManager::returnBook() {
         return;
     }
 
-    cout << "Nhap ngay tra (YYYY-MM-DD): ";
-    getline(cin, returnDate);
+    string returnDate = Validator::inputNonEmptyString("Nhap ngay tra (YYYY-MM-DD): ");
+
+    if (!Validator::isValidDateFormat(returnDate)) {
+        cout << "Ngay tra khong dung dinh dang YYYY-MM-DD.\n";
+        return;
+    }
 
     string bookId = records[recordIndex].getBookId();
     int bookIndex = findBookIndexById(bookId);
 
+    // Neu tim thay sach thi tang lai so luong con
     if (bookIndex != -1) {
         books[bookIndex].setAvailable(books[bookIndex].getAvailable() + 1);
     }
@@ -655,22 +601,18 @@ void LibraryManager::borrowMenu() {
     int choice;
 
     do {
-        cout << "\n===== MUON / TRA SACH =====\n";
+        cout << "\n========================================\n";
+        cout << "             MUON / TRA SACH\n";
+        cout << "========================================\n";
         cout << "1. Muon sach\n";
         cout << "2. Tra sach\n";
         cout << "3. Hien thi danh sach phieu muon/tra\n";
         cout << "4. Tai lai du lieu phieu muon tu file\n";
         cout << "5. Luu du lieu phieu muon vao file\n";
         cout << "0. Quay lai\n";
-        cout << "Nhap lua chon: ";
-        cin >> choice;
+        cout << "----------------------------------------\n";
 
-        if (cin.fail()) {
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Vui long nhap so hop le.\n";
-            continue;
-        }
+        choice = Validator::inputInt("Nhap lua chon: ", 0);
 
         switch (choice) {
             case 1:
@@ -775,20 +717,16 @@ void LibraryManager::statisticsMenu() const {
     int choice;
 
     do {
-        cout << "\n===== THONG KE =====\n";
+        cout << "\n========================================\n";
+        cout << "                THONG KE\n";
+        cout << "========================================\n";
         cout << "1. Thong ke tong quan\n";
         cout << "2. Danh sach sach dang duoc muon\n";
         cout << "3. Danh sach sach da muon het\n";
         cout << "0. Quay lai\n";
-        cout << "Nhap lua chon: ";
-        cin >> choice;
+        cout << "----------------------------------------\n";
 
-        if (cin.fail()) {
-            cin.clear();
-            cin.ignore(numeric_limits<streamsize>::max(), '\n');
-            cout << "Vui long nhap so hop le.\n";
-            continue;
-        }
+        choice = Validator::inputInt("Nhap lua chon: ", 0);
 
         switch (choice) {
             case 1:
