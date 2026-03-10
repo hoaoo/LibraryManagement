@@ -9,8 +9,15 @@ using namespace std;
 LibraryManager::LibraryManager() {
     loadBooks();
     loadReaders();
+    loadBorrowRecords();
+}
+void LibraryManager::loadBorrowRecords() {
+    records = FileHandler::loadBorrowRecordsFromFile("../data/borrows.txt");
 }
 
+void LibraryManager::saveBorrowRecords() const {
+    FileHandler::saveBorrowRecordsToFile("../data/borrows.txt", records);
+}
 void LibraryManager::loadBooks() {
     books = FileHandler::loadBooksFromFile("../data/books.txt");
 }
@@ -26,7 +33,14 @@ void LibraryManager::loadReaders() {
 void LibraryManager::saveReaders() const {
     FileHandler::saveReadersToFile("../data/readers.txt", readers);
 }
-
+int LibraryManager::findBorrowRecordIndexById(const string& recordId) const {
+    for (int i = 0; i < (int)records.size(); i++) {
+        if (records[i].getRecordId() == recordId) {
+            return i;
+        }
+    }
+    return -1;
+}
 int LibraryManager::findBookIndexById(const string& bookId) const {
     for (int i = 0; i < (int)books.size(); i++) {
         if (books[i].getBookId() == bookId) {
@@ -497,6 +511,184 @@ void LibraryManager::readerMenu() {
             case 7:
                 saveReaders();
                 cout << "Da luu du lieu doc gia vao file.\n";
+                break;
+            case 0:
+                cout << "Quay lai menu chinh.\n";
+                break;
+            default:
+                cout << "Lua chon khong hop le.\n";
+        }
+    } while (choice != 0);
+}
+void LibraryManager::borrowBook() {
+    if (books.empty()) {
+        cout << "Khong co sach trong thu vien.\n";
+        return;
+    }
+
+    if (readers.empty()) {
+        cout << "Khong co doc gia nao.\n";
+        return;
+    }
+
+    string recordId, readerId, bookId, borrowDate;
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    cout << "\n===== MUON SACH =====\n";
+
+    cout << "Nhap ma phieu muon: ";
+    getline(cin, recordId);
+
+    if (recordId.empty()) {
+        cout << "Ma phieu muon khong duoc de trong.\n";
+        return;
+    }
+
+    if (findBorrowRecordIndexById(recordId) != -1) {
+        cout << "Ma phieu muon da ton tai.\n";
+        return;
+    }
+
+    cout << "Nhap ma doc gia: ";
+    getline(cin, readerId);
+
+    int readerIndex = findReaderIndexById(readerId);
+    if (readerIndex == -1) {
+        cout << "Khong tim thay doc gia.\n";
+        return;
+    }
+
+    cout << "Nhap ma sach: ";
+    getline(cin, bookId);
+
+    int bookIndex = findBookIndexById(bookId);
+    if (bookIndex == -1) {
+        cout << "Khong tim thay sach.\n";
+        return;
+    }
+
+    if (books[bookIndex].getAvailable() <= 0) {
+        cout << "Sach da het, khong the muon.\n";
+        return;
+    }
+
+    cout << "Nhap ngay muon (YYYY-MM-DD): ";
+    getline(cin, borrowDate);
+
+    records.emplace_back(recordId, readerId, bookId, borrowDate, "", "Borrowed");
+
+    books[bookIndex].setAvailable(books[bookIndex].getAvailable() - 1);
+
+    saveBorrowRecords();
+    saveBooks();
+
+    cout << "Muon sach thanh cong.\n";
+}
+void LibraryManager::returnBook() {
+    if (records.empty()) {
+        cout << "Chua co phieu muon nao.\n";
+        return;
+    }
+
+    string recordId, returnDate;
+
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    cout << "\n===== TRA SACH =====\n";
+    cout << "Nhap ma phieu muon: ";
+    getline(cin, recordId);
+
+    int recordIndex = findBorrowRecordIndexById(recordId);
+    if (recordIndex == -1) {
+        cout << "Khong tim thay phieu muon.\n";
+        return;
+    }
+
+    if (records[recordIndex].getStatus() == "Returned") {
+        cout << "Phieu nay da duoc tra sach roi.\n";
+        return;
+    }
+
+    cout << "Nhap ngay tra (YYYY-MM-DD): ";
+    getline(cin, returnDate);
+
+    string bookId = records[recordIndex].getBookId();
+    int bookIndex = findBookIndexById(bookId);
+
+    if (bookIndex != -1) {
+        books[bookIndex].setAvailable(books[bookIndex].getAvailable() + 1);
+    }
+
+    records[recordIndex].setReturnDate(returnDate);
+    records[recordIndex].setStatus("Returned");
+
+    saveBorrowRecords();
+    saveBooks();
+
+    cout << "Tra sach thanh cong.\n";
+}
+void LibraryManager::showAllBorrowRecords() const {
+    cout << "\n===== DANH SACH PHIEU MUON / TRA =====\n";
+
+    if (records.empty()) {
+        cout << "Chua co phieu muon nao.\n";
+        return;
+    }
+
+    cout << left
+         << setw(12) << "Ma phieu"
+         << setw(12) << "Ma DG"
+         << setw(12) << "Ma sach"
+         << setw(15) << "Ngay muon"
+         << setw(15) << "Ngay tra"
+         << setw(12) << "Trang thai"
+         << endl;
+
+    cout << string(78, '-') << endl;
+
+    for (const auto& record : records) {
+        record.display();
+    }
+}
+void LibraryManager::borrowMenu() {
+    int choice;
+
+    do {
+        cout << "\n===== MUON / TRA SACH =====\n";
+        cout << "1. Muon sach\n";
+        cout << "2. Tra sach\n";
+        cout << "3. Hien thi danh sach phieu muon/tra\n";
+        cout << "4. Tai lai du lieu phieu muon tu file\n";
+        cout << "5. Luu du lieu phieu muon vao file\n";
+        cout << "0. Quay lai\n";
+        cout << "Nhap lua chon: ";
+        cin >> choice;
+
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            cout << "Vui long nhap so hop le.\n";
+            continue;
+        }
+
+        switch (choice) {
+            case 1:
+                borrowBook();
+                break;
+            case 2:
+                returnBook();
+                break;
+            case 3:
+                showAllBorrowRecords();
+                break;
+            case 4:
+                loadBorrowRecords();
+                cout << "Da tai lai du lieu phieu muon.\n";
+                break;
+            case 5:
+                saveBorrowRecords();
+                cout << "Da luu du lieu phieu muon.\n";
                 break;
             case 0:
                 cout << "Quay lai menu chinh.\n";

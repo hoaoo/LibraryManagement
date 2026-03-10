@@ -7,7 +7,7 @@ void showMainMenu() {
     cout << "\n===== LIBRARY MANAGEMENT SYSTEM =====" << endl;
     cout << "1. Quan ly sach" << endl;
     cout << "2. Quan ly doc gia" << endl;
-    cout << "3. Muon sach" << endl;
+    cout << "3. Muon / Tra sach" << endl;
     cout << "4. Tra sach" << endl;
     cout << "5. Thong ke" << endl;
     cout << "0. Thoat" << endl;
@@ -37,10 +37,10 @@ int main() {
                 manager.readerMenu();
                 break;
             case 3:
-                cout << "Chuc nang muon sach dang phat trien." << endl;
+                manager.borrowMenu();
                 break;
             case 4:
-                cout << "Chuc nang tra sach dang phat trien." << endl;
+                cout << "Chuc nang nay da duoc dua vao menu Muon / Tra sach." << endl;
                 break;
             case 5:
                 cout << "Chuc nang thong ke dang phat trien." << endl;

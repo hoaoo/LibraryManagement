@@ -102,4 +102,54 @@ void FileHandler::saveReadersToFile(const string& filename, const vector<Reader>
     }
 
     file.close();
+
+}
+vector<BorrowRecord> FileHandler::loadBorrowRecordsFromFile(const string& filename) {
+    vector<BorrowRecord> records;
+    ifstream file(filename);
+
+    if (!file.is_open()) {
+        cout << "Khong the mo file " << filename << ". Se tao moi khi luu du lieu.\n";
+        return records;
+    }
+
+    string line;
+    while (getline(file, line)) {
+        if (line.empty()) continue;
+
+        stringstream ss(line);
+        string recordId, readerId, bookId, borrowDate, returnDate, status;
+
+        getline(ss, recordId, '|');
+        getline(ss, readerId, '|');
+        getline(ss, bookId, '|');
+        getline(ss, borrowDate, '|');
+        getline(ss, returnDate, '|');
+        getline(ss, status, '|');
+
+        records.emplace_back(recordId, readerId, bookId, borrowDate, returnDate, status);
+    }
+
+    file.close();
+    return records;
+}
+
+void FileHandler::saveBorrowRecordsToFile(const string& filename, const vector<BorrowRecord>& records) {
+    ofstream file(filename);
+
+    if (!file.is_open()) {
+        cout << "Khong the ghi file " << filename << endl;
+        return;
+    }
+
+    for (const auto& record : records) {
+        file << record.getRecordId() << "|"
+             << record.getReaderId() << "|"
+             << record.getBookId() << "|"
+             << record.getBorrowDate() << "|"
+             << record.getReturnDate() << "|"
+             << record.getStatus() << "\n";
+    }
+
+    file.close();
 }

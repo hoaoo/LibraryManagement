@@ -5,6 +5,7 @@
 #include <string>
 #include "../models/Book.h"
 #include "../models/Reader.h"
+#include "../models/BorrowRecord.h"
 
 using namespace std;
 
@@ -15,6 +16,9 @@ public:
 
     static vector<Reader> loadReadersFromFile(const string& filename);
     static void saveReadersToFile(const string& filename, const vector<Reader>& readers);
+
+    static vector<BorrowRecord> loadBorrowRecordsFromFile(const string& filename);
+    static void saveBorrowRecordsToFile(const string& filename, const vector<BorrowRecord>& records);
 };
 
 #endif

@@ -17,6 +17,7 @@ private:
 
     int findBookIndexById(const string& bookId) const;
     int findReaderIndexById(const string& readerId) const;
+    int findBorrowRecordIndexById(const string& recordId) const;
 
 public:
     LibraryManager();
@@ -27,7 +28,9 @@ public:
     void loadReaders();
     void saveReaders() const;
 
-    // Book management
+    void loadBorrowRecords();
+    void saveBorrowRecords() const;
+
     void addBook();
     void showAllBooks() const;
     void findBookById() const;
@@ -35,16 +38,19 @@ public:
     void updateBook();
     void deleteBook();
 
-    // Reader management
     void addReader();
     void showAllReaders() const;
     void findReaderById() const;
     void updateReader();
     void deleteReader();
 
-    // Menu
+    void borrowBook();
+    void returnBook();
+    void showAllBorrowRecords() const;
+
     void bookMenu();
     void readerMenu();
+    void borrowMenu();
 };
 
 #endif
