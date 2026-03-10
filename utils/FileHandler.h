@@ -1,8 +1,16 @@
-//
-// Created by nguye on 3/10/2026.
-//
+#ifndef FILEHANDLER_H
+#define FILEHANDLER_H
 
-#ifndef LIBRARYMANAGEMENT_FILEHANDLER_H
-#define LIBRARYMANAGEMENT_FILEHANDLER_H
+#include <vector>
+#include <string>
+#include "../models/Book.h"
 
-#endif //LIBRARYMANAGEMENT_FILEHANDLER_H
+using namespace std;
+
+class FileHandler {
+public:
+    static vector<Book> loadBooksFromFile(const string& filename);
+    static void saveBooksToFile(const string& filename, const vector<Book>& books);
+};
+
+#endif

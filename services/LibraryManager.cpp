@@ -1,11 +1,22 @@
 #include "LibraryManager.h"
+#include "../utils/FileHandler.h"
 #include <iostream>
 #include <iomanip>
 #include <limits>
 
 using namespace std;
 
-LibraryManager::LibraryManager() {}
+LibraryManager::LibraryManager() {
+    loadBooks();
+}
+
+void LibraryManager::loadBooks() {
+    books = FileHandler::loadBooksFromFile("../data/books.txt");
+}
+
+void LibraryManager::saveBooks() const {
+    FileHandler::saveBooksToFile("../data/books.txt", books);
+}
 
 int LibraryManager::findBookIndexById(const string& bookId) const {
     for (int i = 0; i < (int)books.size(); i++) {
@@ -58,6 +69,7 @@ void LibraryManager::addBook() {
 
     Book newBook(id, title, author, category, quantity, quantity);
     books.push_back(newBook);
+    saveBooks();
 
     cout << "Them sach thanh cong.\n";
 }
@@ -206,6 +218,7 @@ void LibraryManager::updateBook() {
     books[index].setQuantity(quantity);
     books[index].setAvailable(quantity - borrowed);
 
+    saveBooks();
     cout << "Cap nhat sach thanh cong.\n";
 }
 
@@ -233,6 +246,8 @@ void LibraryManager::deleteBook() {
     }
 
     books.erase(books.begin() + index);
+    saveBooks();
+
     cout << "Xoa sach thanh cong.\n";
 }
 
@@ -247,6 +262,8 @@ void LibraryManager::bookMenu() {
         cout << "4. Tim sach theo ten\n";
         cout << "5. Sua thong tin sach\n";
         cout << "6. Xoa sach\n";
+        cout << "7. Tai lai danh sach sach tu file\n";
+        cout << "8. Luu danh sach sach vao file\n";
         cout << "0. Quay lai\n";
         cout << "Nhap lua chon: ";
         cin >> choice;
@@ -276,6 +293,14 @@ void LibraryManager::bookMenu() {
                 break;
             case 6:
                 deleteBook();
+                break;
+            case 7:
+                loadBooks();
+                cout << "Da tai lai du lieu sach tu file.\n";
+                break;
+            case 8:
+                saveBooks();
+                cout << "Da luu du lieu sach vao file.\n";
                 break;
             case 0:
                 cout << "Quay lai menu chinh.\n";

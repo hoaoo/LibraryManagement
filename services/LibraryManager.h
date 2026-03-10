@@ -20,6 +20,9 @@ private:
 public:
     LibraryManager();
 
+    void loadBooks();
+    void saveBooks() const;
+
     // Book management
     void addBook();
     void showAllBooks() const;
