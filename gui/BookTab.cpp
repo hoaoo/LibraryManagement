@@ -21,6 +21,12 @@ BookTab::BookTab(LibraryManager& manager, QWidget *parent)
 void BookTab::setupUi() {
     auto *mainLayout = new QVBoxLayout(this);
 
+    // Tiêu đề tab
+    auto *titleLabel = new QLabel("Book Management", this);
+    titleLabel->setStyleSheet(
+        "QLabel { font-size: 22px; font-weight: 700; color: #0f172a; padding: 4px 0 10px 0; }"
+    );
+
     auto *topLayout = new QHBoxLayout();
     auto *buttonLayout = new QHBoxLayout();
 
@@ -31,6 +37,24 @@ void BookTab::setupUi() {
     editButton = new QPushButton("Edit", this);
     deleteButton = new QPushButton("Delete", this);
     refreshButton = new QPushButton("Refresh", this);
+
+    // Tô màu nút để giao diện rõ chức năng hơn
+    addButton->setStyleSheet(
+        "QPushButton { background:#22c55e; color:white; border:none; border-radius:10px; padding:8px 14px; font-weight:600; }"
+        "QPushButton:hover { background:#16a34a; }"
+    );
+    editButton->setStyleSheet(
+        "QPushButton { background:#3b82f6; color:white; border:none; border-radius:10px; padding:8px 14px; font-weight:600; }"
+        "QPushButton:hover { background:#2563eb; }"
+    );
+    deleteButton->setStyleSheet(
+        "QPushButton { background:#ef4444; color:white; border:none; border-radius:10px; padding:8px 14px; font-weight:600; }"
+        "QPushButton:hover { background:#dc2626; }"
+    );
+    refreshButton->setStyleSheet(
+        "QPushButton { background:#64748b; color:white; border:none; border-radius:10px; padding:8px 14px; font-weight:600; }"
+        "QPushButton:hover { background:#475569; }"
+    );
 
     topLayout->addWidget(new QLabel("Search:", this));
     topLayout->addWidget(searchEdit);
@@ -51,7 +75,11 @@ void BookTab::setupUi() {
     bookTable->setSelectionMode(QAbstractItemView::SingleSelection);
     bookTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     bookTable->verticalHeader()->setVisible(false);
+    bookTable->setAlternatingRowColors(true);
+    bookTable->setShowGrid(false);
+    bookTable->setStyleSheet("QTableWidget::item { padding: 8px; }");
 
+    mainLayout->addWidget(titleLabel);
     mainLayout->addLayout(topLayout);
     mainLayout->addLayout(buttonLayout);
     mainLayout->addWidget(bookTable);
@@ -165,8 +193,9 @@ void BookTab::onEditBook() {
     int newQuantity = QInputDialog::getInt(this, "Edit Book", "Quantity:", oldQuantity, 1, 100000, 1, &ok);
     if (!ok) return;
 
+    // Không cho số lượng tổng nhỏ hơn số sách đang còn/đang cân đối dữ liệu
     if (oldAvailable > newQuantity) {
-        QMessageBox::warning(this, "Edit Book", "Quantity mới không được nhỏ hơn số lượng currently available/balance logic.");
+        QMessageBox::warning(this, "Edit Book", "Quantity mới không được nhỏ hơn số lượng currently available.");
         return;
     }
 

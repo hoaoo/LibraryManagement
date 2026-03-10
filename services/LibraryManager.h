@@ -103,7 +103,7 @@ public:
         if (index == -1) return false;
 
         for (const auto& record : records) {
-            if (record.getBookId() == bookId && record.getStatus() == "Borrowing") {
+            if (record.getBookId() == bookId && record.getStatus() == "Borrowed") {
                 return false;
             }
         }
@@ -138,7 +138,7 @@ public:
         if (index == -1) return false;
 
         for (const auto& record : records) {
-            if (record.getReaderId() == readerId && record.getStatus() == "Borrowing") {
+            if (record.getReaderId() == readerId && record.getStatus() == "Borrowed") {
                 return false;
             }
         }
@@ -166,7 +166,7 @@ public:
             bookId,
             borrowDate,
             "",
-            "Borrowing"
+            "Borrowed"
         ));
 
         books[bookIndex].setAvailable(books[bookIndex].getAvailable() - 1);
@@ -182,7 +182,7 @@ public:
         for (int i = 0; i < static_cast<int>(records.size()); ++i) {
             if (records[i].getReaderId() == readerId &&
                 records[i].getBookId() == bookId &&
-                records[i].getStatus() == "Borrowing") {
+                records[i].getStatus() == "Borrowed") {
                 recordIndex = i;
                 break;
             }
@@ -216,7 +216,7 @@ public:
     vector<BorrowRecord> getBorrowingRecordsGUI() const {
         vector<BorrowRecord> result;
         for (const auto& record : records) {
-            if (record.getStatus() == "Borrowing") {
+            if (record.getStatus() == "Borrowed") {
                 result.push_back(record);
             }
         }
@@ -234,7 +234,7 @@ public:
     int getBorrowingCountGUI() const {
         int count = 0;
         for (const auto& record : records) {
-            if (record.getStatus() == "Borrowing") {
+            if (record.getStatus() == "Borrowed") {
                 ++count;
             }
         }

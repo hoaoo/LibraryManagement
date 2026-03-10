@@ -20,6 +20,12 @@ ReaderTab::ReaderTab(LibraryManager& manager, QWidget *parent)
 
 void ReaderTab::setupUi() {
     auto *mainLayout = new QVBoxLayout(this);
+
+    auto *titleLabel = new QLabel("Reader Management", this);
+    titleLabel->setStyleSheet(
+        "QLabel { font-size: 22px; font-weight: 700; color: #0f172a; padding: 4px 0 10px 0; }"
+    );
+
     auto *topLayout = new QHBoxLayout();
     auto *buttonLayout = new QHBoxLayout();
 
@@ -30,6 +36,23 @@ void ReaderTab::setupUi() {
     editButton = new QPushButton("Edit", this);
     deleteButton = new QPushButton("Delete", this);
     refreshButton = new QPushButton("Refresh", this);
+
+    addButton->setStyleSheet(
+        "QPushButton { background:#22c55e; color:white; border:none; border-radius:10px; padding:8px 14px; font-weight:600; }"
+        "QPushButton:hover { background:#16a34a; }"
+    );
+    editButton->setStyleSheet(
+        "QPushButton { background:#3b82f6; color:white; border:none; border-radius:10px; padding:8px 14px; font-weight:600; }"
+        "QPushButton:hover { background:#2563eb; }"
+    );
+    deleteButton->setStyleSheet(
+        "QPushButton { background:#ef4444; color:white; border:none; border-radius:10px; padding:8px 14px; font-weight:600; }"
+        "QPushButton:hover { background:#dc2626; }"
+    );
+    refreshButton->setStyleSheet(
+        "QPushButton { background:#64748b; color:white; border:none; border-radius:10px; padding:8px 14px; font-weight:600; }"
+        "QPushButton:hover { background:#475569; }"
+    );
 
     topLayout->addWidget(new QLabel("Search:", this));
     topLayout->addWidget(searchEdit);
@@ -50,7 +73,11 @@ void ReaderTab::setupUi() {
     readerTable->setSelectionMode(QAbstractItemView::SingleSelection);
     readerTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     readerTable->verticalHeader()->setVisible(false);
+    readerTable->setAlternatingRowColors(true);
+    readerTable->setShowGrid(false);
+    readerTable->setStyleSheet("QTableWidget::item { padding: 8px; }");
 
+    mainLayout->addWidget(titleLabel);
     mainLayout->addLayout(topLayout);
     mainLayout->addLayout(buttonLayout);
     mainLayout->addWidget(readerTable);

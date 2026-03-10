@@ -1,5 +1,6 @@
 #include "BorrowTab.h"
 
+#include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QFormLayout>
 #include <QGroupBox>
@@ -12,6 +13,7 @@
 #include <QTableWidgetItem>
 #include <QDate>
 #include <QAbstractItemView>
+#include <QLabel>
 
 BorrowTab::BorrowTab(LibraryManager& manager, QWidget *parent)
     : QWidget(parent), manager(manager) {
@@ -22,15 +24,38 @@ BorrowTab::BorrowTab(LibraryManager& manager, QWidget *parent)
 void BorrowTab::setupUi() {
     auto *mainLayout = new QVBoxLayout(this);
 
+    // Tiêu đề chính của tab
+    auto *titleLabel = new QLabel("Borrow / Return", this);
+    titleLabel->setStyleSheet(
+        "QLabel { font-size: 22px; font-weight: 700; color: #0f172a; padding: 4px 0 10px 0; }"
+    );
+
+    // Chia giao diện thành 2 cột:
+    // - Bên trái: form mượn và trả
+    // - Bên phải: bảng lịch sử
+    auto *contentLayout = new QHBoxLayout();
+    auto *leftLayout = new QVBoxLayout();
+    auto *rightLayout = new QVBoxLayout();
+
+    // =========================
+    // KHU VỰC MƯỢN SÁCH
+    // =========================
     auto *borrowGroup = new QGroupBox("Borrow Book", this);
     auto *borrowForm = new QFormLayout();
 
     readerIdEdit = new QLineEdit(this);
     bookIdEdit = new QLineEdit(this);
+
+    // Dùng QDateEdit và ép format hiển thị theo đúng dữ liệu file: yyyy-MM-dd
     borrowDateEdit = new QDateEdit(QDate::currentDate(), this);
     borrowDateEdit->setCalendarPopup(true);
+    borrowDateEdit->setDisplayFormat("yyyy-MM-dd");
 
     borrowButton = new QPushButton("Borrow", this);
+    borrowButton->setStyleSheet(
+        "QPushButton { background:#2563eb; color:white; border:none; border-radius:10px; padding:8px 14px; font-weight:600; }"
+        "QPushButton:hover { background:#1d4ed8; }"
+    );
 
     borrowForm->addRow("Reader ID:", readerIdEdit);
     borrowForm->addRow("Book ID:", bookIdEdit);
@@ -38,14 +63,25 @@ void BorrowTab::setupUi() {
     borrowForm->addRow(borrowButton);
     borrowGroup->setLayout(borrowForm);
 
+    // =========================
+    // KHU VỰC TRẢ SÁCH
+    // =========================
     auto *returnGroup = new QGroupBox("Return Book", this);
     auto *returnForm = new QFormLayout();
 
     returnReaderIdEdit = new QLineEdit(this);
     returnBookIdEdit = new QLineEdit(this);
+
+    // Giữ cùng format yyyy-MM-dd để đồng bộ với file data
     returnDateEdit = new QDateEdit(QDate::currentDate(), this);
     returnDateEdit->setCalendarPopup(true);
+    returnDateEdit->setDisplayFormat("yyyy-MM-dd");
+
     returnButton = new QPushButton("Return", this);
+    returnButton->setStyleSheet(
+        "QPushButton { background:#f59e0b; color:white; border:none; border-radius:10px; padding:8px 14px; font-weight:600; }"
+        "QPushButton:hover { background:#d97706; }"
+    );
 
     returnForm->addRow("Reader ID:", returnReaderIdEdit);
     returnForm->addRow("Book ID:", returnBookIdEdit);
@@ -53,8 +89,16 @@ void BorrowTab::setupUi() {
     returnForm->addRow(returnButton);
     returnGroup->setLayout(returnForm);
 
+    // Nút làm mới lịch sử
     refreshButton = new QPushButton("Refresh History", this);
+    refreshButton->setStyleSheet(
+        "QPushButton { background:#64748b; color:white; border:none; border-radius:10px; padding:8px 14px; font-weight:600; }"
+        "QPushButton:hover { background:#475569; }"
+    );
 
+    // =========================
+    // BẢNG LỊCH SỬ MƯỢN / TRẢ
+    // =========================
     historyTable = new QTableWidget(this);
     historyTable->setColumnCount(6);
     historyTable->setHorizontalHeaderLabels({
@@ -65,12 +109,27 @@ void BorrowTab::setupUi() {
     historyTable->setSelectionBehavior(QAbstractItemView::SelectRows);
     historyTable->setSelectionMode(QAbstractItemView::SingleSelection);
     historyTable->verticalHeader()->setVisible(false);
+    historyTable->setAlternatingRowColors(true);
+    historyTable->setShowGrid(false);
+    historyTable->setStyleSheet("QTableWidget::item { padding: 8px; }");
 
-    mainLayout->addWidget(borrowGroup);
-    mainLayout->addWidget(returnGroup);
-    mainLayout->addWidget(refreshButton);
-    mainLayout->addWidget(historyTable);
+    // Ghép layout trái
+    leftLayout->addWidget(borrowGroup);
+    leftLayout->addWidget(returnGroup);
+    leftLayout->addStretch();
 
+    // Ghép layout phải
+    rightLayout->addWidget(refreshButton);
+    rightLayout->addWidget(historyTable);
+
+    // Ghép 2 cột vào layout chính
+    contentLayout->addLayout(leftLayout, 1);
+    contentLayout->addLayout(rightLayout, 2);
+
+    mainLayout->addWidget(titleLabel);
+    mainLayout->addLayout(contentLayout);
+
+    // Kết nối signal-slot
     connect(borrowButton, &QPushButton::clicked, this, &BorrowTab::onBorrowBook);
     connect(returnButton, &QPushButton::clicked, this, &BorrowTab::onReturnBook);
     connect(refreshButton, &QPushButton::clicked, this, &BorrowTab::onRefreshHistory);
@@ -94,6 +153,8 @@ void BorrowTab::loadHistory() {
 void BorrowTab::onBorrowBook() {
     QString readerId = readerIdEdit->text().trimmed();
     QString bookId = bookIdEdit->text().trimmed();
+
+    // Chuyển ngày sang đúng format lưu file
     QString borrowDate = borrowDateEdit->date().toString("yyyy-MM-dd");
 
     if (readerId.isEmpty() || bookId.isEmpty()) {
@@ -116,6 +177,8 @@ void BorrowTab::onBorrowBook() {
 void BorrowTab::onReturnBook() {
     QString readerId = returnReaderIdEdit->text().trimmed();
     QString bookId = returnBookIdEdit->text().trimmed();
+
+    // Chuyển ngày sang đúng format lưu file
     QString returnDate = returnDateEdit->date().toString("yyyy-MM-dd");
 
     if (readerId.isEmpty() || bookId.isEmpty()) {

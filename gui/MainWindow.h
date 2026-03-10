@@ -18,6 +18,7 @@ public:
     ~MainWindow();
 
 private:
+    // Quản lý dữ liệu dùng chung cho toàn bộ tab
     LibraryManager manager;
 
     QTabWidget *tabWidget;

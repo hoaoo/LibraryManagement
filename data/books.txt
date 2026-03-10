@@ -1,4 +1,5 @@
 B001|Lap trinh C++|Bjarne Stroustrup|Programming|10|10
-B002|Clean Code|Robert C. Martin|Software|5|5
-B003|Data Structures|Mark Allen Weiss|Computer Science|7|6
+B002|Clean Code|Robert C. Martin|Software|5|4
+B003|Data Structures|Mark Allen Weiss|Computer Science|7|7
 B1234|Nhà Giả Kim|Hoan|Tiểu Thuyết|34|34
+H12|Nguyễn Đỗ Hoan|Haon|truyện|12|12

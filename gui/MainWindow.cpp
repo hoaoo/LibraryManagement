@@ -13,6 +13,7 @@ MainWindow::MainWindow(QWidget *parent)
       readerTab(nullptr),
       borrowTab(nullptr),
       statisticsTab(nullptr) {
+    // Nạp dữ liệu ngay khi mở chương trình
     manager.loadBooks();
     manager.loadReaders();
     manager.loadBorrowRecords();
@@ -24,10 +25,11 @@ MainWindow::~MainWindow() = default;
 
 void MainWindow::setupUi() {
     setWindowTitle("Library Management System");
-    resize(1200, 750);
+    resize(1250, 760);
 
     tabWidget = new QTabWidget(this);
 
+    // Truyền manager vào từng tab để dùng chung dữ liệu
     bookTab = new BookTab(manager, this);
     readerTab = new ReaderTab(manager, this);
     borrowTab = new BorrowTab(manager, this);

@@ -19,6 +19,11 @@ StatisticsTab::StatisticsTab(LibraryManager& manager, QWidget *parent)
 void StatisticsTab::setupUi() {
     auto *mainLayout = new QVBoxLayout(this);
 
+    auto *titleLabel = new QLabel("Statistics Dashboard", this);
+    titleLabel->setStyleSheet(
+        "QLabel { font-size: 22px; font-weight: 700; color: #0f172a; padding: 4px 0 10px 0; }"
+    );
+
     auto *statsGroup = new QGroupBox("Overview", this);
     auto *statsLayout = new QGridLayout();
 
@@ -26,6 +31,23 @@ void StatisticsTab::setupUi() {
     totalReadersLabel = new QLabel("Total readers: 0", this);
     borrowingBooksLabel = new QLabel("Books being borrowed: 0", this);
     outOfStockBooksLabel = new QLabel("Out of stock books: 0", this);
+
+    // Style dạng thẻ dashboard
+    QString cardStyle =
+        "QLabel {"
+        "background:#f8fbff;"
+        "border:1px solid #dbeafe;"
+        "border-radius:12px;"
+        "padding:16px;"
+        "font-size:15px;"
+        "font-weight:700;"
+        "color:#1e3a8a;"
+        "}";
+
+    totalBooksLabel->setStyleSheet(cardStyle);
+    totalReadersLabel->setStyleSheet(cardStyle);
+    borrowingBooksLabel->setStyleSheet(cardStyle);
+    outOfStockBooksLabel->setStyleSheet(cardStyle);
 
     statsLayout->addWidget(totalBooksLabel, 0, 0);
     statsLayout->addWidget(totalReadersLabel, 0, 1);
@@ -44,6 +66,9 @@ void StatisticsTab::setupUi() {
     borrowingTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     borrowingTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     borrowingTable->verticalHeader()->setVisible(false);
+    borrowingTable->setAlternatingRowColors(true);
+    borrowingTable->setShowGrid(false);
+    borrowingTable->setStyleSheet("QTableWidget::item { padding: 8px; }");
     borrowingLayout->addWidget(borrowingTable);
     borrowingGroup->setLayout(borrowingLayout);
 
@@ -57,11 +82,19 @@ void StatisticsTab::setupUi() {
     outOfStockTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     outOfStockTable->setEditTriggers(QAbstractItemView::NoEditTriggers);
     outOfStockTable->verticalHeader()->setVisible(false);
+    outOfStockTable->setAlternatingRowColors(true);
+    outOfStockTable->setShowGrid(false);
+    outOfStockTable->setStyleSheet("QTableWidget::item { padding: 8px; }");
     outOfStockLayout->addWidget(outOfStockTable);
     outOfStockGroup->setLayout(outOfStockLayout);
 
     refreshButton = new QPushButton("Refresh Statistics", this);
+    refreshButton->setStyleSheet(
+        "QPushButton { background:#0f172a; color:white; border:none; border-radius:10px; padding:8px 14px; font-weight:600; }"
+        "QPushButton:hover { background:#1e293b; }"
+    );
 
+    mainLayout->addWidget(titleLabel);
     mainLayout->addWidget(statsGroup);
     mainLayout->addWidget(borrowingGroup);
     mainLayout->addWidget(outOfStockGroup);
